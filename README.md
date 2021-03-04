@@ -1,24 +1,61 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Routes
 
-Things you may want to cover:
+> bundle exec rails routes
 
-* Ruby version
+```txt
+v2_companies GET    /v2/companies(.:format)   api/v2/companies#show
+v3_companies GET    /companies(.:format)      api/v3/companies#show
+v4_companies GET    /companies(.:format)      api/v4/companies#show
+```
 
-* System dependencies
+## Examples
 
-* Configuration
+### API v2
 
-* Database creation
+> curl http://127.0.0.1:3000/v2/companies/
 
-* Database initialization
+```json
+{"version":2}
+```
 
-* How to run the test suite
+### API v3
 
-* Services (job queues, cache servers, search engines, etc.)
+> curl -H "Accept: application/vnd.example+json;version=3" http://127.0.0.1:3000/companies/
 
-* Deployment instructions
+```json
+{"version":3}
+```
 
-* ...
+### API v4
+
+> curl -H "Accept: application/vnd.example+json;version=4" http://127.0.0.1:3000/companies/
+
+```json
+{"version":4}
+```
+
+### Default API
+
+> curl http://127.0.0.1:3000/companies/
+
+```json
+{"version":3}
+```
+
+ℹ️ The API v3 is the default one, due to this settings:
+
+```ruby
+Rails.application.routes.draw do
+  scope module: :api do
+    # ...
+
+    scope module: :v3, as: 'v3', constraints: ::Route::ApiVersionConstraints.new(version: 3, default: true) do
+      get 'companies/', to: 'companies#show'
+    end
+
+    # ...
+  end
+end
+```
